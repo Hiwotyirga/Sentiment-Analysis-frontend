@@ -1,23 +1,46 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [text, setText] = useState('');
+  const [sentiment, setSentiment] = useState(null);
+
+  // Function to handle submission
+  const handleAnalyze = async () => {
+    if (!text.trim()) return;
+    try {
+      // Replace with your backend API call
+      const response = await fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      const result = await response.json();
+      setSentiment(result.sentiment); // Assuming your API returns a 'sentiment' field
+    } catch (error) {
+      console.error("Error analyzing text:", error);
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Sentiment Analysis</h1>
+      <div className="input-area">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Enter text for sentiment analysis..."
+          rows="4"
+          cols="50"
+        />
+        <button onClick={handleAnalyze}>Analyze</button>
+      </div>
+      {sentiment && (
+        <div className="result-area">
+          <h3>Analysis Result:</h3>
+          <p>{sentiment}</p>
+        </div>
+      )}
     </div>
   );
 }
